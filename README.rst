@@ -273,11 +273,3 @@ After the file has been opened, it can easily be converted into a pandas DataFra
     df = pd.read_json('tweets.json', encoding='utf-8')
 
 
-
-Stuff for local dev: 
-cd twitterscraper/
-ls
-pip uninstall -e .
-pip uninstall twitterscraper
-python3 setup.py develop
-pip install -e .
