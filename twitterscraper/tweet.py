@@ -7,7 +7,7 @@ from coala_utils.decorators import generate_ordering
 @generate_ordering('timestamp', 'id', 'text', 'user', 'replies', 'retweets', 'likes')
 class Tweet:
     def __init__(self, username, fullname, user_id, tweet_id, tweet_url, timestamp, timestamp_epochs, replies, retweets,
-                 likes, is_retweet, retweeter_username, retweeter_userid, retweet_id,text, html, image):
+                likes, is_retweet, retweeter_username, retweeter_userid, retweet_id,text, html, image_urls, has_video):
         self.username = username.strip('\@')
         self.fullname = fullname
         self.user_id = user_id
@@ -24,12 +24,12 @@ class Tweet:
         self.retweet_id = retweet_id
         self.text = text
         self.html = html
-        self.image = image
+        self.image_urls = image_urls
+        self.has_video = has_video
 
     @classmethod
     def from_soup(cls, tweet):
         tweet_div = tweet.find('div', 'tweet')
-        print(tweet_div)
         username = tweet_div["data-screen-name"]
         fullname = tweet_div["data-name"]
         user_id = tweet_div["data-user-id"]
@@ -48,12 +48,13 @@ class Tweet:
             retweeter_userid = ""
             is_retweet = 0
 
-        # Get any images attached to tweet
-        try:
-            image_div = tweet.find('div', 'AdaptiveMedia-photoContainer')
-            image = image_div["data-image-url"]
-        except: 
-            image = ""
+        images_urls = [
+            div.find("img").attrs.get("src", '') for div
+            in tweet_div.findAll("div", "AdaptiveMedia-photoContainer")
+        ]
+
+        has_video = tweet_div.find("div", "PlayableMedia-players") is not None
+
 
 
         text = tweet.find('p', 'tweet-text').text or ""
@@ -69,7 +70,7 @@ class Tweet:
         html = str(tweet.find('p', 'tweet-text')) or ""
             
         c = cls(username, fullname, user_id, tweet_id, tweet_url, timestamp, timestamp_epochs, replies, retweets, likes,
-                 is_retweet, retweeter_username, retweeter_userid, retweet_id,text, html, image)
+                 is_retweet, retweeter_username, retweeter_userid, retweet_id,text, html, images_urls, has_video)
         return c
 
     @classmethod
