@@ -73,7 +73,7 @@ def linspace(start, stop, n):
 proxies = get_proxies()
 proxy_pool = cycle(proxies)
 
-def query_single_page(query, lang, pos, retry=5, from_user=False, timeout=60):
+def query_single_page(query, lang, pos, retry=2, from_user=False, timeout=60):
     """
     Returns tweets from the given URL.
 
